@@ -20,6 +20,19 @@ fn main() {
         }
     };
 
+    let mut web_hashes: File = match OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open(HASH_FILE_PATH)
+    {
+        Ok(file) => file,
+        Err(e) => {
+            eprintln!("Failed to find hashes file '{}': {}", HASH_FILE_PATH, e);
+            return;
+        }
+    };
+
     let hashes: String = match read_to_string(HASH_FILE_PATH) {
         Ok(s) => s,
         Err(e) => {
@@ -71,19 +84,6 @@ fn main() {
             hash_map.insert(url.to_string(), hash);
         }
     }
-
-    let mut web_hashes: File = match OpenOptions::new()
-        .write(true)
-        .create(true)
-        .truncate(true)
-        .open(HASH_FILE_PATH)
-    {
-        Ok(file) => file,
-        Err(e) => {
-            eprintln!("Failed to find hashes file '{}': {}", HASH_FILE_PATH, e);
-            return;
-        }
-    };
 
     for (url, hash) in hash_map {
         if let Err(e) = writeln!(web_hashes, "{}, {}", url, hash) {
