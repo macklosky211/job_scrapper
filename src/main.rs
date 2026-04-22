@@ -52,8 +52,7 @@ fn main() {
                     continue;
                 } else {
                     // hashes didnt match -- this is what im looking for
-                    let out =
-                        format!("----------\nCHANGE FOUND FOR: '{}'\n----------", url).green();
+                    let out = format!("CHANGE FOUND FOR: '{}'", url).green();
                     println!("{out}");
                     hash_map.insert(url.to_string(), hash); // overwrite old hash
                 }
