@@ -1,6 +1,7 @@
 /// To use this program just create a websites.csv file.
 /// Each line of the file should be a full url pointing to a website.
 use colored::Colorize;
+use scraper::{Html, Selector};
 use sha2::{Digest, Sha256};
 use std::{
     collections::HashMap,
@@ -98,12 +99,26 @@ fn hash_str(s: &str) -> String {
 }
 
 fn hash_website(url: &str) -> String {
-    let web_data = ureq::get(url)
+    let raw_html = ureq::get(url)
         .call()
         .unwrap()
         .into_body()
         .read_to_string()
         .unwrap();
 
+    let web_data = strip_html(raw_html.as_str());
+
     return hash_str(web_data.as_str());
+}
+
+fn strip_html(html: &str) -> String {
+    let document = Html::parse_document(html);
+
+    let selector = Selector::parse("body *:not(script):not(style):not(meta)").unwrap();
+    let text = document
+        .select(&selector)
+        .flat_map(|el| el.text())
+        .collect::<String>();
+
+    text.split_whitespace().collect::<Vec<&str>>().join(" ")
 }
